@@ -2,13 +2,17 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   typescript: {
+    // Giữ lại cái này để nó không bắt lỗi vặt khi build
     ignoreBuildErrors: true,
   },
-  eslint: {
-    ignoreDuringBuilds: true,
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+    ],
   },
-  // Thêm dòng này để tăng tốc build
-  swcMinify: true,
 };
 
 export default nextConfig;
