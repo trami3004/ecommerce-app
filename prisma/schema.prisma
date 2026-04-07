@@ -1,0 +1,58 @@
+// 1. Cấu hình chung
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 2. Định nghĩa các Model theo tài liệu
+model Category {
+  id       String    @id @default(cuid())
+  name     String    @unique
+  slug     String    @unique
+  products Product[]
+}
+
+model Product {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  price       Decimal   @db.Decimal(10, 2) @default(0)
+  stock       Int
+  images      String[]
+  featured    Boolean   @default(false)
+  categoryId  String
+  category    Category  @relation(fields: [categoryId], references: [id])
+  orderItems  OrderItem[] // Cần thêm model OrderItem nếu bạn làm phần Order
+}
+
+model Order {
+  id        String      @id @default(cuid())
+  email     String
+  status    OrderStatus @default(PENDING)
+  total     Decimal     @db.Decimal(10, 2)
+  items     OrderItem[]
+  stripeld  String?
+  // ... các trường khác
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  price     Decimal @db.Decimal(10, 2)
+}
